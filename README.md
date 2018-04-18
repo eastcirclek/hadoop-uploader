@@ -1,14 +1,19 @@
 # hadoop-uploader
+
+## Introduction
 **hadoop-uploader** is a file uploader specialized for uploading many small files to Hadoop. 
-We use this uploader to copy small files (20MB on average) stored on an external hard drive to HDFS. 
-While ```hdfs dfs -put <src> <dest>``` takes around 3 days to upload 10TB, this uploader takes less than 12 hours. This uploader is designed to benefit from sequential read speed of the source file system and benefit from computing power on the target Hadoop cluster.
+We use **hadoop-uploader** to copy small files (20MB on average) stored on an external hard drive to HDFS. 
+While ```hdfs dfs -put``` takes around 3 days to upload 10TB, **hadoop-uploader**  takes less than 12 hours. 
 
-
-Uploading many small files onto HDFS using ```hdfs dfs -put <source directory> <destination directory>``` could suffer from very low network and disk bandwidth.
-The HDFS protocol tells a client to contact with a namenode every time it initiates a procedure for copying a file, thus preventing the client from spending time purely on uploading the content of files.
+Uploading many small files onto HDFS using ```hdfs dfs -put``` could suffer from very low network and disk bandwidth.
+The HDFS protocol tells a client to contact with a namenode every time it initiates a procedure for copying a file, thus preventing the client from spending time purely on uploading file contents.
 Launching multiple HDFS clients could partly alleviate such a problem but it can introduce random access which can cause severe performance problems on hard disks.
 
-The uploading process consists of two phases, **upload** and **extract**, and users can adjust the number of tasks of each phase using different parameter values. Upload tasks are executed on the client side while extract tasks are executed on the Hadoop cluster.
+**hadoop-uploader** is designed to benefit from sequential read speed of the source file system and benefit from computing power on the target Hadoop cluster.
+
+## How it works
+
+**hadoop-uploader** consists of two phases, **upload** and **extract**. Upload tasks are executed on the client side while extract tasks are executed on the Hadoop cluster.
 The execution of the two phases can be overlapped so the entire uploading job can be done around the time when the upload phase is finished. 
 
 A upload phase partitions a set of files into smaller sets, and each set is uploaded to HDFS by a upload task.
